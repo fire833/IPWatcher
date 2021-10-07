@@ -1,0 +1,13 @@
+# Systemd service to enable IPWatcher to watch for public IP changes.
+
+[Unit]
+Description= A daemon to track your public IP address and report changes to a backend notification API.
+Documentation= https://github.com/fire833/IpWatcher
+
+[Service]
+Type= simple
+ExecStart= /usr/bin/ipwatcher
+ExecStop= /bin/kill -2 $MAINPID
+
+[Install]
+WantedBy=multi-user.target
