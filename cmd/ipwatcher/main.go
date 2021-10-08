@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/fire833/ipwatcher/src/config"
 	"github.com/fire833/ipwatcher/src/flag"
 	"github.com/fire833/ipwatcher/src/watcher"
 	"github.com/integrii/flaggy"
@@ -16,6 +17,7 @@ func main() {
 
 	flaggy.Parse()
 
-	go watcher.WatcherThread()
+	config.LoadConfig()
+	watcher.WatcherThread()
 
 }

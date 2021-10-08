@@ -17,8 +17,10 @@ type IpWatcherConfig struct {
 	PollingInterval int `json:"polling_interval" yaml:"pollingInterval"`
 	// Specify number of previous responses you want to keep cached in memory over time.
 	CachedResponseBuffer int `json:"cache_response" yaml:"cacheResponse"`
+	// Define what resolver you want used to find your public IP. can either be my-ip or whatsmyip.
+	IPresolver string `json:"resolver" yaml:"resolver"`
 	// Define the location you want to poll for your current IP address.
-	IPMirrorURL string `json:"ip_url" yaml:"ipUrl"`
+	// IPMirrorURL string `json:"ip_url" yaml:"ipUrl"`
 }
 
 func LoadConfig() {

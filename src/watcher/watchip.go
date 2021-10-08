@@ -1,27 +1,18 @@
 package watcher
 
 import (
-	"encoding/json"
-	"log"
 	"net"
 	"time"
 
 	"github.com/fire833/ipwatcher/src/config"
-
-	"github.com/valyala/fasthttp"
+	"github.com/fire833/ipwatcher/src/watcher/parsers"
 )
 
 // Cache of all previously stored IP responses for comparison.
 var LocalCache *ipCache = new(ipCache)
 
-type MyIpResp struct {
-	Success bool   `json:"success"`
-	IP      string `json:"ip"`
-	Type    string `json:"type"`
-}
-
 type iPResult struct {
-	IP   *net.IPNet
+	IP   net.IP
 	Time time.Time
 }
 
@@ -34,7 +25,7 @@ type ipCache struct {
 func WatcherThread() {
 	for {
 		ip := &iPResult{
-			IP:   AcquireIP(),
+			IP:   AcquireIP(&parsers.MyIPParser{}),
 			Time: time.Now(),
 		}
 		if len(LocalCache.Cache)+1 > config.GlobalConfig.CachedResponseBuffer {
@@ -65,29 +56,20 @@ func WatcherThread() {
 	}
 }
 
-func AcquireIP() (Ip *net.IPNet) {
+func AcquireIP(p parsers.IpParserLocator) (Ip net.IP) {
 
-	req := fasthttp.AcquireRequest()
-	defer fasthttp.ReleaseRequest(req)
-	resp := fasthttp.AcquireResponse()
-	defer fasthttp.ReleaseResponse(resp)
-
-	req.SetRequestURI("https://api.my-ip.io/ip.json")
-
-	if err := fasthttp.Do(req, resp); err != nil {
-		log.Default().Printf("Error with acquiring public IP from %s, error is: %v", "api.my-ip.io", err)
+	switch config.GlobalConfig.IPresolver {
+	case "whatsmyip":
+		{
+			resolv := &parsers.WhatsMyIPAddrParser{}
+			resolv.Get()
+			return resolv.ParseIP()
+		}
+	default:
+		{
+			resolv := &parsers.MyIPParser{}
+			resolv.Get()
+			return resolv.ParseIP()
+		}
 	}
-
-	// var r *map[string]string
-	r := &MyIpResp{}
-
-	json.Unmarshal(resp.Body(), r)
-
-	_, ipnet, err1 := net.ParseCIDR(r.IP)
-	if err1 != nil {
-		log.Default().Fatalf("Error with parsing CIDR from %s, error is: %v", "api.my-ip.io", err1)
-	}
-
-	return ipnet
-
 }
