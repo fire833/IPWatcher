@@ -14,6 +14,10 @@ type WhatsMyIPAddrParser struct {
 	addrb net.IP
 }
 
+func (p *WhatsMyIPAddrParser) Name() string {
+	return "bot.whatismyipaddress.com"
+}
+
 func (p *WhatsMyIPAddrParser) ParseIP() net.IP {
 	return p.addrb
 }
@@ -22,7 +26,7 @@ func (p *WhatsMyIPAddrParser) GetStringIP() string {
 	return p.addr
 }
 
-func (p *WhatsMyIPAddrParser) Get() {
+func (p *WhatsMyIPAddrParser) Get() error {
 
 	req := fasthttp.AcquireRequest()
 	defer fasthttp.ReleaseRequest(req)
@@ -32,7 +36,8 @@ func (p *WhatsMyIPAddrParser) Get() {
 	req.SetRequestURI("https://bot.whatismyipaddress.com")
 
 	if err := fasthttp.Do(req, resp); err != nil {
-		log.Default().Printf("Error with acquiring public IP from %s, error is: %v", "bot.whatismyipaddress.com", err)
+		log.Default().Printf("Error with acquiring public IP from %s, error is: %v", p.Name(), err)
+		return err
 	}
 
 	p.body = resp.Body()
@@ -43,6 +48,8 @@ func (p *WhatsMyIPAddrParser) Get() {
 	} else {
 		p.isV4 = false
 	}
+
+	return nil
 
 }
 

@@ -22,6 +22,10 @@ type MyIPParser struct {
 	addrb  net.IP
 }
 
+func (p *MyIPParser) Name() string {
+	return "api.my-ip.io"
+}
+
 func (p *MyIPParser) ParseIP() net.IP {
 	return p.addrb
 }
@@ -30,7 +34,7 @@ func (p *MyIPParser) GetStringIP() string {
 	return p.addr
 }
 
-func (p *MyIPParser) Get() {
+func (p *MyIPParser) Get() error {
 
 	req := fasthttp.AcquireRequest()
 	defer fasthttp.ReleaseRequest(req)
@@ -40,7 +44,8 @@ func (p *MyIPParser) Get() {
 	req.SetRequestURI("https://api.my-ip.io/ip.json")
 
 	if err := fasthttp.Do(req, resp); err != nil {
-		log.Default().Printf("Error with acquiring public IP from %s, error is: %v", "api.my-ip.io", err)
+		log.Default().Printf("Error with acquiring public IP from %s, error is: %v", p.Name(), err)
+		return err
 	}
 
 	p.body = resp.Body()
@@ -48,7 +53,8 @@ func (p *MyIPParser) Get() {
 	parse := &MyIpResp{}
 
 	if err1 := json.Unmarshal(resp.Body(), parse); err1 != nil {
-		log.Default().Printf("Error with unmarshalling public IP info from %s, error is: %v", "api.my-ip.io", err1)
+		log.Default().Printf("Error with unmarshalling public IP info from %s, error is: %v", p.Name(), err1)
+		return err1
 	}
 
 	p.parsed = parse
@@ -60,6 +66,7 @@ func (p *MyIPParser) Get() {
 		p.isV4 = false
 	}
 
+	return nil
 }
 
 func (p *MyIPParser) IsV4() bool {

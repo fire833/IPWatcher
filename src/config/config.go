@@ -21,6 +21,24 @@ type IpWatcherConfig struct {
 	IPresolver string `json:"resolver" yaml:"resolver"`
 	// Define the location you want to poll for your current IP address.
 	// IPMirrorURL string `json:"ip_url" yaml:"ipUrl"`
+	IPInfoGatherer string `json:"info_gatherer" yaml:"info_gatherer"`
+	// Configuration for the pushover notification backend
+	Pushover *PushoverConfig `jsopn:"pushover" yaml:"pushover"`
+}
+
+// Configuration for the pushover notification backend
+type PushoverConfig struct {
+	ApiKey string   `json:"api_key" yaml:"apiKey"`
+	Users  []string `json:"users" yaml:"users"`
+}
+
+type SlackConfig struct {
+}
+
+type DiscordConfig struct {
+}
+
+type WebhookConfig struct {
 }
 
 func LoadConfig() {

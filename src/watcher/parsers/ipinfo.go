@@ -29,6 +29,10 @@ type IPInfoParser struct {
 	parsed *IPInfo
 }
 
+func (p *IPInfoParser) Name() string {
+	return "ipinfo.io"
+}
+
 func (p *IPInfoParser) GetASN() string {
 	asn := strings.SplitN(p.parsed.Org, " ", 2)
 	return asn[0]
@@ -67,22 +71,22 @@ func (p *IPInfoParser) Get(ip net.IP) {
 		req.SetRequestURI(fmt.Sprintf("https://ipinfo.io/%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]))
 
 		if err := fasthttp.Do(req, resp); err != nil {
-			log.Default().Printf("Error with acquiring public IP information from %s, error is: %v", "https://ipinfo.io", err)
+			log.Default().Printf("Error with acquiring public IP information from %s, error is: %v", p.Name(), err)
 		}
 
 		if err1 := json.Unmarshal(resp.Body(), p.parsed); err1 != nil {
-			log.Default().Printf("Error with unmarshalling public IP info from %s, error is: %v", "https://ipinfo.io", err1)
+			log.Default().Printf("Error with unmarshalling public IP info from %s, error is: %v", p.Name(), err1)
 		}
 
 	} else if len(ip) == net.IPv6len {
 		req.SetRequestURI(fmt.Sprintf("https://ipinfo.io/%x%x:%x%x:%x%x:%x%x:%x%x:%x%x:%x%x:%x%x", ip[0], ip[1], ip[2], ip[3], ip[4], ip[5], ip[6], ip[7], ip[8], ip[9], ip[10], ip[11], ip[12], ip[13], ip[14], ip[15]))
 
 		if err := fasthttp.Do(req, resp); err != nil {
-			log.Default().Printf("Error with acquiring public IP information from %s, error is: %v", "https://ipinfo.io", err)
+			log.Default().Printf("Error with acquiring public IP information from %s, error is: %v", p.Name(), err)
 		}
 
 		if err1 := json.Unmarshal(resp.Body(), p.parsed); err1 != nil {
-			log.Default().Printf("Error with unmarshalling public IP info from %s, error is: %v", "https://ipinfo.io", err1)
+			log.Default().Printf("Error with unmarshalling public IP info from %s, error is: %v", p.Name(), err1)
 		}
 	}
 }
