@@ -15,16 +15,19 @@ var GlobalConfig *IpWatcherConfig = new(IpWatcherConfig)
 type IpWatcherConfig struct {
 	// Define the time between polling for your current IP address.
 	PollingInterval int `json:"polling_interval" yaml:"pollingInterval"`
-	// Specify number of previous responses you want to keep cached in memory over time.
-	CachedResponseBuffer int `json:"cache_response" yaml:"cacheResponse"`
 	// Define what resolver you want used to find your public IP. can either be my-ip or whatsmyip.
 	IPresolver string `json:"resolver" yaml:"resolver"`
-	// Define the location you want to poll for your current IP address.
-	// IPMirrorURL string `json:"ip_url" yaml:"ipUrl"`
+	// Define what info-gatherer you want to use to gather information about your new IP. currently only uses ipinfo.
 	IPInfoGatherer string `json:"info_gatherer" yaml:"info_gatherer"`
 	// Configuration for the pushover notification backend
-	Pushover *PushoverConfig `jsopn:"pushover" yaml:"pushover"`
+	Pushover *PushoverConfig `json:"pushover,omitempty" yaml:"pushover,omitempty"`
+	Discord  *DiscordConfig  `json:"discord,omitempty" yaml:"discord,omitempty"`
+	Slack    *SlackConfig    `json:"slack,omitmepty" yaml:"slack,omitmepty"`
+	Teams    *TeamsConfig    `json:"teams,omitempty" yaml:"teams,omitempty"`
+	Webhook  *WebhookConfig  `json:"webhook,omitempty" yaml:"webhook,omitempty"`
 }
+
+type Webhook string
 
 // Configuration for the pushover notification backend
 type PushoverConfig struct {
@@ -33,12 +36,22 @@ type PushoverConfig struct {
 }
 
 type SlackConfig struct {
+	Webhooks []Webhook `json:"hooks" yaml:"hooks"`
 }
 
 type DiscordConfig struct {
+	Webhooks []Webhook `json:"hooks" yaml:"hooks"`
+}
+
+type TeamsConfig struct {
+	Webhooks []Webhook `json:"hooks" yamls:"hooks"`
 }
 
 type WebhookConfig struct {
+	Webhooks []Webhook `json:"hooks" yaml:"hooks"`
+}
+
+type TelegramConfig struct {
 }
 
 func LoadConfig() {

@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"log"
 	"time"
 
 	"github.com/fire833/ipwatcher/src/config"
@@ -35,21 +36,23 @@ func (n *PushoverNotification) Send(msg *Message) error {
 	app := pushover.New(config.GlobalConfig.Pushover.ApiKey) // TODO add support for getting tokens from file.
 
 	for i, user := range config.GlobalConfig.Pushover.Users {
-		resp, _ := app.SendMessage(pmsg, pushover.NewRecipient(user))
+		if resp, err := app.SendMessage(pmsg, pushover.NewRecipient(user)); err != nil {
+			log.Default().Printf("Error with sending %s notification: %v", n.Name(), err)
+		} else {
 
-		if i == len(config.GlobalConfig.Pushover.Users)-1 {
-			lim := &Limit{
-				MessagesRemaining: resp.Limit.Remaining,
-				MessagesLeftWeek:  resp.Limit.Remaining,
-				MessagesLeftMonth: resp.Limit.Remaining,
+			if i == len(config.GlobalConfig.Pushover.Users)-1 {
+				lim := &Limit{
+					MessagesRemaining: resp.Limit.Remaining,
+					MessagesLeftWeek:  resp.Limit.Remaining,
+					MessagesLeftMonth: resp.Limit.Remaining,
+				}
+
+				n.l = lim
 			}
 
-			n.l = lim
+			// Wait 1 second per request to be friendly to the API.
+			time.Sleep(time.Second)
 		}
-
-		// Wait 1 second per request to be friendly to the API.
-		time.Sleep(time.Second)
-
 	}
 
 	return nil
