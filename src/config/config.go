@@ -4,11 +4,18 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/fire833/ipwatcher/src/flag"
 )
+
+var Version string = "unknown"
+var Commit string = "unknown"
+var Go string = runtime.Version()
+var Os string = runtime.GOOS
+var Arch string = runtime.GOARCH
 
 var GlobalConfig *IpWatcherConfig = new(IpWatcherConfig)
 

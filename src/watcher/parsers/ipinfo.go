@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/fire833/ipwatcher/src/config"
 	"github.com/valyala/fasthttp"
 )
 
@@ -66,6 +67,10 @@ func (p *IPInfoParser) Get(ip net.IP) {
 	defer fasthttp.ReleaseRequest(req)
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseResponse(resp)
+
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.SetMethod("GET")
+	req.Header.Add("User-Agent", fmt.Sprintf("IPWatcher v%s", config.Version))
 
 	if len(ip) == net.IPv4len {
 		req.SetRequestURI(fmt.Sprintf("https://ipinfo.io/%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]))

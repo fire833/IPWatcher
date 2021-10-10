@@ -38,4 +38,6 @@ type Notifier interface {
 	GetLimit() *Limit
 	// Return the name of the notifier backend
 	Name() string
+	// Return an error of the notifier backend
+	Error() string
 }

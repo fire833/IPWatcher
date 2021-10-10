@@ -17,7 +17,7 @@ func main() {
 
 	flaggy.SetName("ipwatcher")
 	flaggy.SetDescription("A daemon to track your public IP address and report changes to a backend notification API.")
-	flaggy.SetVersion("")
+	flaggy.SetVersion(config.Version + "\nGit commit: " + config.Commit + "\nGo version: " + config.Go + "\nOS: " + config.Os + "\nArchitecture: " + config.Arch)
 
 	flaggy.String(&flag.ConfigFile, "c", "config", "Define a custom configuration location for ipwatcher to parse/utilize.")
 	flaggy.Parse()

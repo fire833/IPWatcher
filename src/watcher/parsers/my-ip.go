@@ -2,9 +2,11 @@ package parsers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net"
 
+	"github.com/fire833/ipwatcher/src/config"
 	"github.com/valyala/fasthttp"
 )
 
@@ -42,6 +44,9 @@ func (p *MyIPParser) Get() error {
 	defer fasthttp.ReleaseResponse(resp)
 
 	req.SetRequestURI("https://api.my-ip.io/ip.json")
+	req.Header.SetMethod("GET")
+	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("User-Agent", fmt.Sprintf("IPWatcher v%s", config.Version))
 
 	if err := fasthttp.Do(req, resp); err != nil {
 		log.Default().Printf("Error with acquiring public IP from %s, error is: %v", p.Name(), err)

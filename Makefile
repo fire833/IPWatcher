@@ -1,10 +1,18 @@
 
-DEFAULTGOOS = "linux"
-DEFAULTGOARCH = "amd64"
+VERSION == 0.01
+DEFAULTGOOS == "linux"
+DEFAULTGOARCH == "amd64"
 
 all: 
-	go build -ldflags "" cmd/ipwatcher/main.go -o bin/ipwatcher
+	
+	# export GOOS=${DEFAULTGOOS} && export GOARCH=${DEFAULTGOARCH}
+	
+	echo "Building binary from source..."
+	commit="$(git rev-parse HEAD)"
 
+	go build -o bin/ipwatcher -ldflags "-X 'config.Version=${VERSION}' -X 'config.Commit=${commit}' -X 'config.AllowExec=true'" cmd/ipwatcher/main.go
+
+#Run as sudo
 install:
 	
 	install cmd/ipwatcher/ipwatcher /usr/bin/ipwatcher
@@ -15,6 +23,7 @@ install:
 	systemctl enable ipwatcher.service
 	systemctl start ipwatcher.service
 
+# Run as sudo
 remove: 
 
 	systemctl stop ipwatcher.service
@@ -25,6 +34,7 @@ remove:
 
 	systemctl daemon-reload
 
+# Run as sudo
 config:
 
 	mkdir /etc/ipwatcher && touch /etc/ipwatcher/config.json

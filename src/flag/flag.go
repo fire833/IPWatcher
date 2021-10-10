@@ -9,9 +9,6 @@ import (
 var ConfigLocation string
 var ConfigFile string
 
-var SlackBackend bool = false
-var Discordbackend bool = false
-
 func init() {
 	switch runtime.GOOS {
 	case "windows":

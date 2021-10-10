@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/fire833/ipwatcher/src/config"
@@ -8,6 +9,8 @@ import (
 )
 
 type TeamsNotification struct {
+	l *Limit
+	e string
 }
 
 func (n *TeamsNotification) Name() string {
@@ -25,6 +28,8 @@ func (n *TeamsNotification) Send(msg *Message) error {
 		// Setup the request
 		req.SetRequestURI(string(hook))
 		req.Header.SetMethod("POST")
+		req.Header.Add("Content-Type", "application/json")
+		req.Header.Add("User-Agent", fmt.Sprintf("IPWatcher v%s", config.Version))
 
 		if err := fasthttp.Do(req, resp); err != nil {
 			log.Default().Printf("Error with sending %s notification: %v", n.Name(), err)
@@ -36,5 +41,9 @@ func (n *TeamsNotification) Send(msg *Message) error {
 }
 
 func (n *TeamsNotification) Limit() *Limit {
-	return nil
+	return n.l
+}
+
+func (n *TeamsNotification) Error() string {
+	return n.e
 }

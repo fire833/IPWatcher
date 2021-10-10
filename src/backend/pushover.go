@@ -11,6 +11,7 @@ import (
 type PushoverNotification struct {
 	// Limit
 	l *Limit
+	e string
 }
 
 func (n *PushoverNotification) Name() string {
@@ -60,4 +61,8 @@ func (n *PushoverNotification) Send(msg *Message) error {
 
 func (n *PushoverNotification) Limit() *Limit {
 	return n.l
+}
+
+func (n *PushoverNotification) Error() string {
+	return n.e
 }
