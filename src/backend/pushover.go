@@ -4,14 +4,26 @@ import (
 	"log"
 	"time"
 
-	"github.com/fire833/ipwatcher/src/config"
 	"github.com/gregdel/pushover"
 )
+
+var PushoverIsUsed bool = false
+var PLC *PushoverConfig
 
 type PushoverNotification struct {
 	// Limit
 	l *Limit
 	e string
+}
+
+// Configuration for the pushover notification backend
+type PushoverConfig struct {
+	ApiKey string   `json:"api_key" yaml:"apiKey"`
+	Users  []string `json:"users" yaml:"users"`
+}
+
+func init() {
+	PLC = new(PushoverConfig)
 }
 
 func (n *PushoverNotification) Name() string {
@@ -34,14 +46,14 @@ func (n *PushoverNotification) Send(msg *Message) error {
 		Sound:       msg.Sound,
 	}
 
-	app := pushover.New(config.GlobalConfig.Pushover.ApiKey) // TODO add support for getting tokens from file.
+	app := pushover.New(PLC.ApiKey) // TODO add support for getting tokens from file.
 
-	for i, user := range config.GlobalConfig.Pushover.Users {
+	for i, user := range PLC.Users {
 		if resp, err := app.SendMessage(pmsg, pushover.NewRecipient(user)); err != nil {
 			log.Default().Printf("Error with sending %s notification: %v", n.Name(), err)
 		} else {
 
-			if i == len(config.GlobalConfig.Pushover.Users)-1 {
+			if i == len(PLC.Users)-1 {
 				lim := &Limit{
 					MessagesRemaining: resp.Limit.Remaining,
 					MessagesLeftWeek:  resp.Limit.Remaining,

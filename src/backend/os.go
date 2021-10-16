@@ -4,11 +4,20 @@ import (
 	"log"
 	"os/exec"
 	"runtime"
+
+	"github.com/fire833/ipwatcher/src/config"
 )
+
+var OSIsUsed bool = false
 
 type OSNotification struct {
 	l *Limit
 	e string
+}
+
+func init() {
+	n := new(OSNotification)
+	config.RegisterConfig(n.Name(), nil, OSIsUsed, false)
 }
 
 func (n *OSNotification) Name() string {

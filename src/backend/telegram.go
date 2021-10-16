@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -8,9 +9,30 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+var TLC *TelegramConfig
+var TelegramIsUsed bool = false
+
 type TelegramNotification struct {
 	l *Limit
 	e string
+}
+
+type TelegramConfig struct {
+	Webhooks []config.Webhook `json:"hooks"`
+}
+
+func (c *TelegramConfig) UnmarshalConfig(input []byte) {
+
+	json.Unmarshal(input, c)
+
+}
+
+func init() {
+
+	TLC = new(TelegramConfig)
+	n := new(TelegramNotification)
+	config.RegisterConfig(n.Name(), DC, TelegramIsUsed, false)
+
 }
 
 func (n *TelegramNotification) Name() string {

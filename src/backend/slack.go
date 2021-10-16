@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -8,9 +9,29 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+var SC *SlackConfig
+
 type SlackNotification struct {
 	l *Limit
 	e string
+}
+
+type SlackConfig struct {
+	Webhooks []config.Webhook `json:"hooks"`
+}
+
+func (c *SlackConfig) UnmarshalConfig(input []byte) {
+
+	json.Unmarshal(input, c)
+
+}
+
+func init() {
+
+	SC = new(SlackConfig)
+	n := new(DiscordNotification)
+	config.RegisterConfig(n.Name(), DC, DiscordIsUsed, false)
+
 }
 
 func (n *SlackNotification) Name() string {
@@ -19,7 +40,7 @@ func (n *SlackNotification) Name() string {
 
 func (n *SlackNotification) Send(msg *Message) error {
 
-	for _, hook := range config.GlobalConfig.Slack.Webhooks {
+	for _, hook := range SC.Webhooks {
 		req := fasthttp.AcquireRequest()
 		defer fasthttp.ReleaseRequest(req)
 		resp := fasthttp.AcquireResponse()

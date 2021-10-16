@@ -1,13 +1,17 @@
-package flag
+package config
 
 import (
 	"path/filepath"
 	"runtime"
+
+	"github.com/integrii/flaggy"
 )
 
 // Add flag vars to be referenced by main and other packages
 var ConfigLocation string
 var ConfigFile string
+
+var Globalflags *flaggy.Parser
 
 func init() {
 	switch runtime.GOOS {
@@ -22,4 +26,11 @@ func init() {
 			ConfigFile = filepath.Join(ConfigLocation, "config.json")
 		}
 	}
+
+	Globalflags = flaggy.NewParser("ipwatcher")
+	Globalflags.Description = "A daemon to track your public IP address and report changes to a backend notification API."
+	Globalflags.Version = Version + "\nGit commit: " + Commit + "\nGo version: " + Go + "\nOS: " + Os + "\nArchitecture: " + Arch
+
+	Globalflags.String(&ConfigFile, "c", "config", "Define a custom configuration location for ipwatcher to parse/utilize.")
+
 }

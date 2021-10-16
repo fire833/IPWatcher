@@ -9,9 +9,30 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+var WC *WebhookConfig
+var WebhookIsUsed bool = false
+
 type WebhookNotification struct {
 	l *Limit
 	e string
+}
+
+type WebhookConfig struct {
+	Webhooks []config.Webhook `json:"hooks"`
+}
+
+func (c *WebhookConfig) UnmarshalConfig(input []byte) {
+
+	json.Unmarshal(input, c)
+
+}
+
+func init() {
+
+	WC = new(WebhookConfig)
+	n := new(WebhookNotification)
+	config.RegisterConfig(n.Name(), DC, WebhookIsUsed, false)
+
 }
 
 func (n *WebhookNotification) Name() string {
@@ -20,7 +41,7 @@ func (n *WebhookNotification) Name() string {
 
 func (n *WebhookNotification) Send(msg *Message) error {
 
-	for _, hook := range config.GlobalConfig.Webhook.Webhooks {
+	for _, hook := range WC.Webhooks {
 		req := fasthttp.AcquireRequest()
 		defer fasthttp.ReleaseRequest(req)
 		resp := fasthttp.AcquireResponse()

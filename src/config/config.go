@@ -2,13 +2,12 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
 
 	"gopkg.in/yaml.v3"
-
-	"github.com/fire833/ipwatcher/src/flag"
 )
 
 var Version string = "unknown"
@@ -19,6 +18,12 @@ var Arch string = runtime.GOARCH
 
 var GlobalConfig *IpWatcherConfig = new(IpWatcherConfig)
 
+var BackendConfigs map[string]BackendConfig
+
+type BackendConfig interface {
+	UnmarshalConfig(input []byte)
+}
+
 type IpWatcherConfig struct {
 	// Define the time between polling for your current IP address.
 	PollingInterval int `json:"polling_interval" yaml:"pollingInterval"`
@@ -26,27 +31,11 @@ type IpWatcherConfig struct {
 	IPresolver string `json:"resolver" yaml:"resolver"`
 	// Define what info-gatherer you want to use to gather information about your new IP. currently only uses ipinfo.
 	IPInfoGatherer string `json:"info_gatherer" yaml:"info_gatherer"`
-	// Configuration for the pushover notification backend
-	Pushover *PushoverConfig `json:"pushover,omitempty" yaml:"pushover,omitempty"`
-	Discord  *DiscordConfig  `json:"discord,omitempty" yaml:"discord,omitempty"`
-	Slack    *SlackConfig    `json:"slack,omitmepty" yaml:"slack,omitmepty"`
-	Teams    *TeamsConfig    `json:"teams,omitempty" yaml:"teams,omitempty"`
-	Webhook  *WebhookConfig  `json:"webhook,omitempty" yaml:"webhook,omitempty"`
 }
 
 type Webhook string
 
-// Configuration for the pushover notification backend
-type PushoverConfig struct {
-	ApiKey string   `json:"api_key" yaml:"apiKey"`
-	Users  []string `json:"users" yaml:"users"`
-}
-
 type SlackConfig struct {
-	Webhooks []Webhook `json:"hooks" yaml:"hooks"`
-}
-
-type DiscordConfig struct {
 	Webhooks []Webhook `json:"hooks" yaml:"hooks"`
 }
 
@@ -63,7 +52,7 @@ type TelegramConfig struct {
 
 func LoadConfig() {
 
-	data, err := os.ReadFile(flag.ConfigFile)
+	data, err := os.ReadFile(ConfigFile)
 	if err != nil {
 		// Default just panic if the config can't be found for now.
 		panic(err)
@@ -71,7 +60,7 @@ func LoadConfig() {
 
 	c := &IpWatcherConfig{}
 
-	ext := filepath.Ext(flag.ConfigFile)
+	ext := filepath.Ext(ConfigFile)
 
 	switch {
 	case ext == ".json":
@@ -97,4 +86,9 @@ func LoadConfig() {
 			panic("Unsupported configuration extension.")
 		}
 	}
+}
+
+func RegisterConfig(name string, conf BackendConfig, isUsed bool, isDefaultOn bool) {
+	BackendConfigs[name] = conf
+	Globalflags.Bool(&isUsed, fmt.Sprintf("%s", name), fmt.Sprintf("backend.%s", name), fmt.Sprintf("Call this flag to automatically enable the backend %s. (Default on?: %v)", name, isDefaultOn))
 }

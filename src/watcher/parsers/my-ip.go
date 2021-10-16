@@ -10,6 +10,8 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+var MyIPIsUsed bool = false
+
 type MyIpResp struct {
 	Success bool   `json:"success"`
 	IP      string `json:"ip"`
@@ -22,6 +24,11 @@ type MyIPParser struct {
 	isV4   bool
 	parsed *MyIpResp
 	addrb  net.IP
+}
+
+func init() {
+	p := new(MyIPParser)
+	config.RegisterConfig(p.Name(), nil, MyIPIsUsed, false)
 }
 
 func (p *MyIPParser) Name() string {

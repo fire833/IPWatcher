@@ -9,6 +9,9 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+var DC *DiscordConfig
+var DiscordIsUsed bool = false
+
 type DiscordMsg struct {
 	Content   string `json:"content"`
 	Username  string `json:"username,omitempty"`
@@ -20,6 +23,24 @@ type DiscordMsg struct {
 type DiscordNotification struct {
 	l *Limit
 	e string
+}
+
+type DiscordConfig struct {
+	Webhooks []config.Webhook `json:"hooks"`
+}
+
+func (c *DiscordConfig) UnmarshalConfig(input []byte) {
+
+	json.Unmarshal(input, c)
+
+}
+
+func init() {
+
+	DC = new(DiscordConfig)
+	n := new(DiscordNotification)
+	config.RegisterConfig(n.Name(), DC, DiscordIsUsed, false)
+
 }
 
 func (n *DiscordNotification) Name() string {
@@ -35,7 +56,7 @@ func (n *DiscordNotification) Send(msg *Message) error {
 		Tts:       false,
 	}
 
-	for _, hook := range config.GlobalConfig.Discord.Webhooks {
+	for _, hook := range DC.Webhooks {
 		req := fasthttp.AcquireRequest()
 		defer fasthttp.ReleaseRequest(req)
 		resp := fasthttp.AcquireResponse()

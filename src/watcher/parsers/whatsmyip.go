@@ -9,11 +9,18 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+var WhatsMyIPIsUsed bool = true
+
 type WhatsMyIPAddrParser struct {
 	body  []byte
 	isV4  bool
 	addr  string
 	addrb net.IP
+}
+
+func init() {
+	p := new(WhatsMyIPAddrParser)
+	config.RegisterConfig(p.Name(), nil, WhatsMyIPIsUsed, true)
 }
 
 func (p *WhatsMyIPAddrParser) Name() string {

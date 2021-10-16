@@ -12,6 +12,8 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+var IPInfoIsUsed bool = true
+
 type IPInfo struct {
 	IP       string `json:"ip"`
 	Hostname string `json:"hostname"`
@@ -28,6 +30,11 @@ type IPInfo struct {
 type IPInfoParser struct {
 	// body   []byte
 	parsed *IPInfo
+}
+
+func init() {
+	p := new(IPInfoParser)
+	config.RegisterConfig(p.Name(), nil, IPInfoIsUsed, true)
 }
 
 func (p *IPInfoParser) Name() string {

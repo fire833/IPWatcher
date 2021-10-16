@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 
@@ -8,9 +9,30 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+var TC *TeamsConfig
+var TeamsIsUsed bool = false
+
 type TeamsNotification struct {
 	l *Limit
 	e string
+}
+
+type TeamsConfig struct {
+	Webhooks []config.Webhook `json:"hooks"`
+}
+
+func (c *TeamsConfig) UnmarshalConfig(input []byte) {
+
+	json.Unmarshal(input, c)
+
+}
+
+func init() {
+
+	TC = new(TeamsConfig)
+	n := new(TeamsNotification)
+	config.RegisterConfig(n.Name(), DC, TeamsIsUsed, false)
+
 }
 
 func (n *TeamsNotification) Name() string {
@@ -19,7 +41,7 @@ func (n *TeamsNotification) Name() string {
 
 func (n *TeamsNotification) Send(msg *Message) error {
 
-	for _, hook := range config.GlobalConfig.Teams.Webhooks {
+	for _, hook := range TC.Webhooks {
 		req := fasthttp.AcquireRequest()
 		defer fasthttp.ReleaseRequest(req)
 		resp := fasthttp.AcquireResponse()
