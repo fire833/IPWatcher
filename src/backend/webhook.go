@@ -22,17 +22,23 @@ type WebhookConfig struct {
 }
 
 func (c *WebhookConfig) UnmarshalConfig(input []byte) {
+	if WebhookIsUsed {
+		WC = new(WebhookConfig)
+	} else {
+		return
+	}
 
-	json.Unmarshal(input, c)
-
+	if err := json.Unmarshal(input, WC); err == nil {
+		n := new(WebhookNotification)
+		RegisterNotifier(n)
+	} else {
+		return
+	}
 }
 
 func init() {
-
-	WC = new(WebhookConfig)
 	n := new(WebhookNotification)
 	config.RegisterConfig(n.Name(), DC, WebhookIsUsed, false)
-
 }
 
 func (n *WebhookNotification) Name() string {
@@ -65,7 +71,7 @@ func (n *WebhookNotification) Send(msg *Message) error {
 	return nil
 }
 
-func (n *WebhookNotification) Limit() *Limit {
+func (n *WebhookNotification) GetLimit() *Limit {
 	return n.l
 }
 

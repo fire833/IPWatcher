@@ -48,7 +48,7 @@ func (n *OSNotification) Send(msg *Message) error {
 	return nil
 }
 
-func (n *OSNotification) Limit() *Limit {
+func (n *OSNotification) GetLimit() *Limit {
 	return n.l
 }
 

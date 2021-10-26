@@ -81,7 +81,7 @@ func (n *DiscordNotification) Send(msg *Message) error {
 	return nil
 }
 
-func (n *DiscordNotification) Limit() *Limit {
+func (n *DiscordNotification) GetLimit() *Limit {
 	return n.l
 }
 

@@ -6,8 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
-
-	"gopkg.in/yaml.v3"
 )
 
 var Version string = "unknown"
@@ -18,7 +16,7 @@ var Arch string = runtime.GOARCH
 
 var GlobalConfig *IpWatcherConfig = new(IpWatcherConfig)
 
-var BackendConfigs map[string]BackendConfig
+var BackendConfigs map[string]BackendConfig = map[string]BackendConfig{}
 
 type BackendConfig interface {
 	UnmarshalConfig(input []byte)
@@ -33,21 +31,22 @@ type IpWatcherConfig struct {
 	IPInfoGatherer string `json:"info_gatherer" yaml:"info_gatherer"`
 }
 
+func (c *IpWatcherConfig) UnmarshalConfig(input []byte) {
+	if err := json.Unmarshal(input, c); err != nil {
+		fmt.Println("Unable to load configuration.")
+		os.Exit(1)
+	}
+}
+
 type Webhook string
-
-type SlackConfig struct {
-	Webhooks []Webhook `json:"hooks" yaml:"hooks"`
-}
-
-type TeamsConfig struct {
-	Webhooks []Webhook `json:"hooks" yamls:"hooks"`
-}
 
 type WebhookConfig struct {
 	Webhooks []Webhook `json:"hooks" yaml:"hooks"`
 }
 
-type TelegramConfig struct {
+func init() {
+	GlobalConfig = new(IpWatcherConfig)
+	RegisterConfig("ipwatcher", GlobalConfig, true, true)
 }
 
 func LoadConfig() {
@@ -58,32 +57,42 @@ func LoadConfig() {
 		panic(err)
 	}
 
-	c := &IpWatcherConfig{}
-
 	ext := filepath.Ext(ConfigFile)
 
 	switch {
 	case ext == ".json":
 		{
-			err1 := json.Unmarshal(data, c)
+			var c map[string]json.RawMessage
+
+			err1 := json.Unmarshal(data, &c)
 			if err1 != nil {
 				panic(err1)
 			}
 
-			GlobalConfig = c
-		}
-	case ext == ".yml" || ext == ".yaml":
-		{
-			err1 := yaml.Unmarshal(data, c)
-			if err1 != nil {
-				panic(err1)
+			GlobalConfig.UnmarshalConfig(c["ipwatcher"])
+
+			// Unmarshal all configurations with the respective backends so they can
+			// then register with the daemon as being eligible/configured to perform their task.
+			for name, conf := range BackendConfigs {
+				conf.UnmarshalConfig(c[name])
 			}
 
-			GlobalConfig = c
 		}
+	// case ext == ".yml" || ext == ".yaml":
+	// 	{
+	// 		var c map[string]yaml.RawMessage
+
+	// 		err1 := yaml.Unmarshal(data, &c)
+	// 		if err1 != nil {
+	// 			panic(err1)
+	// 		}
+
+	// 		GlobalConfig = c
+	// 	}
 	default:
 		{
-			panic("Unsupported configuration extension.")
+			fmt.Println("Unsupported configuration file extension.")
+			os.Exit(1)
 		}
 	}
 }
@@ -91,4 +100,5 @@ func LoadConfig() {
 func RegisterConfig(name string, conf BackendConfig, isUsed bool, isDefaultOn bool) {
 	BackendConfigs[name] = conf
 	Globalflags.Bool(&isUsed, fmt.Sprintf("%s", name), fmt.Sprintf("backend.%s", name), fmt.Sprintf("Call this flag to automatically enable the backend %s. (Default on?: %v)", name, isDefaultOn))
+	return
 }

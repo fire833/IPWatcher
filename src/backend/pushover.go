@@ -23,7 +23,7 @@ type PushoverConfig struct {
 }
 
 func init() {
-	PLC = new(PushoverConfig)
+
 }
 
 func (n *PushoverNotification) Name() string {
@@ -71,7 +71,7 @@ func (n *PushoverNotification) Send(msg *Message) error {
 	return nil
 }
 
-func (n *PushoverNotification) Limit() *Limit {
+func (n *PushoverNotification) GetLimit() *Limit {
 	return n.l
 }
 

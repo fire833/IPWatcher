@@ -11,7 +11,7 @@ import (
 var ConfigLocation string
 var ConfigFile string
 
-var Globalflags *flaggy.Parser
+var Globalflags *flaggy.Parser = new(flaggy.Parser)
 
 func init() {
 	switch runtime.GOOS {

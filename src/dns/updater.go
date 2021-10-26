@@ -2,8 +2,11 @@ package dns
 
 import (
 	"errors"
+	"log"
 	"net"
 )
+
+var DNSUpdaters []DNSUpdater
 
 // Interface that all DNS Updater types need to match in order to be considered proper
 // DNS updaters that can be called if needed.
@@ -19,6 +22,12 @@ var (
 	HostnameError = errors.New("Incorrect hostname provided.")
 	TTLError      = errors.New("Invalid TTL parameter provided for this DNS entry.")
 )
+
+func RegisterDNSUpdater(d DNSUpdater) {
+	DNSUpdaters = append(DNSUpdaters, d)
+	log.Default().Printf("Successfully registered %s as a DNS updater.", d.Name())
+	return
+}
 
 type DNSEntry struct {
 	Type     string

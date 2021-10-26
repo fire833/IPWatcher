@@ -18,21 +18,27 @@ type TelegramNotification struct {
 }
 
 type TelegramConfig struct {
-	Webhooks []config.Webhook `json:"hooks"`
+	ApiKey string `json:"api_key"`
 }
 
 func (c *TelegramConfig) UnmarshalConfig(input []byte) {
+	if TelegramIsUsed {
+		TLC = new(TelegramConfig)
+	} else {
+		return
+	}
 
-	json.Unmarshal(input, c)
-
+	if err := json.Unmarshal(input, TLC); err == nil {
+		n := new(TelegramNotification)
+		RegisterNotifier(n)
+	} else {
+		return
+	}
 }
 
 func init() {
-
-	TLC = new(TelegramConfig)
 	n := new(TelegramNotification)
 	config.RegisterConfig(n.Name(), DC, TelegramIsUsed, false)
-
 }
 
 func (n *TelegramNotification) Name() string {
@@ -58,7 +64,7 @@ func (n *TelegramNotification) Send(msg *Message) error {
 	return nil
 }
 
-func (n *TelegramNotification) Limit() *Limit {
+func (n *TelegramNotification) GetLimit() *Limit {
 	return n.l
 }
 

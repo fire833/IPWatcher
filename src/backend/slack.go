@@ -10,6 +10,7 @@ import (
 )
 
 var SC *SlackConfig
+var SlackIsUsed bool = false
 
 type SlackNotification struct {
 	l *Limit
@@ -21,17 +22,23 @@ type SlackConfig struct {
 }
 
 func (c *SlackConfig) UnmarshalConfig(input []byte) {
+	if SlackIsUsed {
+		SC = new(SlackConfig)
+	} else {
+		return
+	}
 
-	json.Unmarshal(input, c)
-
+	if err := json.Unmarshal(input, SC); err == nil {
+		n := new(SlackNotification)
+		RegisterNotifier(n)
+	} else {
+		return
+	}
 }
 
 func init() {
-
-	SC = new(SlackConfig)
 	n := new(DiscordNotification)
 	config.RegisterConfig(n.Name(), DC, DiscordIsUsed, false)
-
 }
 
 func (n *SlackNotification) Name() string {
@@ -61,7 +68,7 @@ func (n *SlackNotification) Send(msg *Message) error {
 	return nil
 }
 
-func (n *SlackNotification) Limit() *Limit {
+func (n *SlackNotification) GetLimit() *Limit {
 	return n.l
 }
 

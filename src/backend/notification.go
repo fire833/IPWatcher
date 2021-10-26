@@ -1,6 +1,7 @@
 package backend
 
 import (
+	"log"
 	"time"
 )
 
@@ -27,10 +28,6 @@ type Limit struct {
 	MessagesLeftMonth int `json:"remaining_month" yaml:"remainingMonth"`
 }
 
-func LoadNotifiers() {
-
-}
-
 type Notifier interface {
 	// Use this method to send a message using the specified backend.
 	Send(msg *Message) error
@@ -40,4 +37,10 @@ type Notifier interface {
 	Name() string
 	// Return an error of the notifier backend
 	Error() string
+}
+
+func RegisterNotifier(in Notifier) {
+	GlobalNotifiers = append(GlobalNotifiers, in)
+	log.Default().Printf("Successfully registered %s notifier with IPwatcher.", in.Name())
+	return
 }

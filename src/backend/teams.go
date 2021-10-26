@@ -22,17 +22,23 @@ type TeamsConfig struct {
 }
 
 func (c *TeamsConfig) UnmarshalConfig(input []byte) {
+	if TeamsIsUsed {
+		TC = new(TeamsConfig)
+	} else {
+		return
+	}
 
-	json.Unmarshal(input, c)
-
+	if err := json.Unmarshal(input, TC); err == nil {
+		n := new(WebhookNotification)
+		RegisterNotifier(n)
+	} else {
+		return
+	}
 }
 
 func init() {
-
-	TC = new(TeamsConfig)
 	n := new(TeamsNotification)
 	config.RegisterConfig(n.Name(), DC, TeamsIsUsed, false)
-
 }
 
 func (n *TeamsNotification) Name() string {
@@ -62,7 +68,7 @@ func (n *TeamsNotification) Send(msg *Message) error {
 	return nil
 }
 
-func (n *TeamsNotification) Limit() *Limit {
+func (n *TeamsNotification) GetLimit() *Limit {
 	return n.l
 }
 

@@ -6,7 +6,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/fire833/ipwatcher/src/backend"
 	"github.com/fire833/ipwatcher/src/config"
 	"github.com/fire833/ipwatcher/src/watcher"
 )
@@ -16,7 +15,6 @@ func main() {
 	config.Globalflags.Parse()
 
 	config.LoadConfig()
-	backend.LoadNotifiers()
 	go watcher.WatcherThread()
 
 	sig := make(chan os.Signal)
