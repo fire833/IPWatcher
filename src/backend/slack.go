@@ -9,7 +9,7 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-var SC *SlackConfig
+var SC *SlackConfig = new(SlackConfig)
 var SlackIsUsed bool = false
 
 type SlackNotification struct {

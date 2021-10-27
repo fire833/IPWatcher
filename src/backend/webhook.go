@@ -41,9 +41,7 @@ func init() {
 	config.RegisterConfig(n.Name(), DC, WebhookIsUsed, false)
 }
 
-func (n *WebhookNotification) Name() string {
-	return "Webhook"
-}
+func (n *WebhookNotification) Name() string { return "Webhook" }
 
 func (n *WebhookNotification) Send(msg *Message) error {
 

@@ -19,6 +19,7 @@ install:
 	install bin/ipwatcher /usr/bin/ipwatcher
 	chmod 755 /usr/bin/ipwatcher
 	install ipwatcher.service /usr/lib/systemd/system/ipwatcher.service
+	chmod 644 /usr/lib/systemd/system/ipwatcher.service
 
 	systemctl daemon-reload
 	systemctl enable ipwatcher.service

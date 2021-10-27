@@ -20,9 +20,7 @@ func init() {
 	config.RegisterConfig(n.Name(), nil, OSIsUsed, false)
 }
 
-func (n *OSNotification) Name() string {
-	return "OS-Notification"
-}
+func (n *OSNotification) Name() string { return "OS-Notification" }
 
 func (n *OSNotification) Send(msg *Message) error {
 	switch runtime.GOOS {
