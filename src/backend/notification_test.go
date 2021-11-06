@@ -29,3 +29,7 @@ func TestTelegramBackend(t *testing.T) {
 func TestWebhookBackend(t *testing.T) {
 
 }
+
+func TestSyslogBackend(t *testing.T) {
+
+}

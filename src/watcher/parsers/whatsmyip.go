@@ -18,11 +18,6 @@ type WhatsMyIPAddrParser struct {
 	addrb net.IP
 }
 
-func init() {
-	p := new(WhatsMyIPAddrParser)
-	config.RegisterConfig(p.Name(), nil, WhatsMyIPIsUsed, true)
-}
-
 func (p *WhatsMyIPAddrParser) Name() string {
 	return "bot.whatismyipaddress.com"
 }
@@ -44,8 +39,8 @@ func (p *WhatsMyIPAddrParser) Get() error {
 
 	req.SetRequestURI("https://bot.whatismyipaddress.com")
 	req.Header.SetMethod("GET")
-	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("User-Agent", fmt.Sprintf("IPWatcher v%s", config.Version))
+	req.Header.SetContentType("application/json")
+	req.Header.SetUserAgent(fmt.Sprintf("IPWatcher v%s", config.Version))
 
 	if err := fasthttp.Do(req, resp); err != nil {
 		log.Default().Printf("Error with acquiring public IP from %s, error is: %v", p.Name(), err)

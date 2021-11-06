@@ -26,11 +26,6 @@ type MyIPParser struct {
 	addrb  net.IP
 }
 
-func init() {
-	p := new(MyIPParser)
-	config.RegisterConfig(p.Name(), nil, MyIPIsUsed, false)
-}
-
 func (p *MyIPParser) Name() string {
 	return "api.my-ip.io"
 }
@@ -53,7 +48,8 @@ func (p *MyIPParser) Get() error {
 	req.SetRequestURI("https://api.my-ip.io/ip.json")
 	req.Header.SetMethod("GET")
 	req.Header.Add("Content-Type", "application/json")
-	req.Header.Add("User-Agent", fmt.Sprintf("IPWatcher v%s", config.Version))
+	req.Header.SetContentType("application/json")
+	req.Header.SetUserAgent(fmt.Sprintf("IPWatcher v%s", config.Version))
 
 	if err := fasthttp.Do(req, resp); err != nil {
 		log.Default().Printf("Error with acquiring public IP from %s, error is: %v", p.Name(), err)

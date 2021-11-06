@@ -86,12 +86,12 @@ func (d *CloudflareDNSUpdater) UpdateDNS(OldHost string, NewEntry *DNSEntry) err
 	defer fasthttp.ReleaseResponse(resp)
 
 	req.Header.SetMethod("PUT")
-	req.Header.Add("Content-type", "application/json")
-	req.Header.Add("User-Agent", fmt.Sprintf("IPWatcher v%s", config.Version))
+	req.Header.SetContentType("application/json")
+	req.Header.SetUserAgent(fmt.Sprintf("IPWatcher v%s", config.Version))
 	req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", CC.ApiKey)) // Add API key token to request header for authentication.
 	// req.Header.Add("X-Auth-Email", CC.UserEmail) // Add email because apprently they just changed their API or something.
 
-	req.SetBody([]byte(fmt.Sprintf(`{type":"%s","name":"%s","content":"%s","ttl":3600,"proxied":%v}`,
+	req.SetBody([]byte(fmt.Sprintf(`{"type":"%s","name":"%s","content":"%s","ttl":3600,"proxied":%v}`,
 		NewEntry.Type, NewEntry.Hostname, NewEntry.Content.String(), CC.ProxyEntries)))
 	req.SetRequestURI(fmt.Sprintf("https://api.cloudflare.com/client/v4/zones/%s/dns_records/%s", CC.ZoneID, recordid))
 

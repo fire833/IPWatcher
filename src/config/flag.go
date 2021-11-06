@@ -11,7 +11,7 @@ import (
 var ConfigLocation string
 var ConfigFile string
 
-var Globalflags *flaggy.Parser = new(flaggy.Parser)
+var Globalflags *flaggy.Parser = flaggy.NewParser("ipwatcher")
 
 func init() {
 	switch runtime.GOOS {
@@ -27,7 +27,6 @@ func init() {
 		}
 	}
 
-	Globalflags = flaggy.NewParser("ipwatcher")
 	Globalflags.Description = "A daemon to track your public IP address and report changes to a backend notification API."
 	Globalflags.Version = Version + "\nGit commit: " + Commit + "\nGo version: " + Go + "\nOS: " + Os + "\nArchitecture: " + Arch
 

@@ -56,8 +56,8 @@ func (n *TeamsNotification) Send(msg *Message) error {
 		// Setup the request
 		req.SetRequestURI(string(hook))
 		req.Header.SetMethod("POST")
-		req.Header.Add("Content-Type", "application/json")
-		req.Header.Add("User-Agent", fmt.Sprintf("IPWatcher v%s", config.Version))
+		req.Header.SetContentType("application/json")
+		req.Header.SetUserAgent(fmt.Sprintf("IPWatcher v%s", config.Version))
 
 		if err := fasthttp.Do(req, resp); err != nil {
 			log.Default().Printf("Error with sending %s notification: %v", n.Name(), err)
